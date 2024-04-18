@@ -1,21 +1,16 @@
 provider "google" {
   project = "my-dev-project-399904"
-  region  = "yus-central1"
+  region  = "us-central1"
 }
+resource "google_compute_instance_from_template" "tpl" {
+  name = "instance-from-template"
+  zone = "us-central1-a"
 
-resource "google_compute_instance_template" "example" {
-  name        = "example-template"
-  machine_type = "n1-standard-1"
-  disk {
-    source_image = "debian-cloud/debian-10"
-    auto_delete  = true
-  }
-  network_interface {
-    network = "default"
-    access_config {}
-  }
-}
+  source_instance_template = google_compute_instance_template.example-template.self_link_unique
 
-output "template_self_link" {
-  value = google_compute_instance_template.example.self_link
+  // Override fields from instance template
+  can_ip_forward = false
+  labels = {
+    my_key = "my_value"
+  }
 }
