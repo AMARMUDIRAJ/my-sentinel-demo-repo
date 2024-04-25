@@ -4,7 +4,7 @@ provider "google" {
 }
 resource "google_compute_instance_template" "example" {
   name        = "example-template"
-  machine_type = "n1-standard-1"
+  machine_type = "e2-medium"
   disk {
     source_image = "debian-cloud/debian-10"
     auto_delete  = true
