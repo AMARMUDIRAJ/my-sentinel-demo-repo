@@ -1,21 +1,15 @@
+
 provider "google" {
   project = "my-dev-project-399904"
   region  = "us-central1"
 }
-resource "google_compute_instance_template" "example12345" {
-  name        = "example-template12345"
-  machine_type = "e2-medium"
-  disk {
-    source_image = "debian-cloud/debian-10"
-    auto_delete  = true
-  }
-  network_interface {
-    network = "my-own-network-dev"
-	subnetwork = "web-subnet"
-    access_config {}
-  }
+
+data "google_compute_instance_template" "existing_template" {
+  self_link = "projects/my-dev-project-399904/global/instancetemplates/example-template12345"
 }
 
-output "template_self_link" {
-  value = google_compute_instance_template.example12345.self_link
+resource "google_compute_instance_from_template" "instance" {
+  name           = "instance-from-template"
+  zone           = "us-central1-a"
+  source_instance_template = data.google_compute_instance_template.existing_template.self_link
 }
