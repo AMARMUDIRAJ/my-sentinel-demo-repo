@@ -2,8 +2,8 @@ provider "google" {
   project = "my-dev-project-399904"
   region  = "us-central1"
 }
-resource "google_compute_instance_template" "example" {
-  name        = "example-template"
+resource "google_compute_instance_template" "example12345" {
+  name        = "example-template12345"
   machine_type = "e2-medium"
   disk {
     source_image = "debian-cloud/debian-10"
@@ -17,5 +17,5 @@ resource "google_compute_instance_template" "example" {
 }
 
 output "template_self_link" {
-  value = google_compute_instance_template.example.self_link
+  value = google_compute_instance_template.example12345.self_link
 }
