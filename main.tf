@@ -1,11 +1,10 @@
+data "google_compute_instance_template" "example-template12345" {
+  self_link = "projects/my-dev-project-399904/global/instanceTemplates/example-template12345"
+}
 
 provider "google" {
   project = "my-dev-project-399904"
   region  = "us-central1"
-}
-
-data "google_compute_instance_template" "example-template12345" {
-  self_link = "projects/my-dev-project-399904/global/instancetemplates/example-template12345"
 }
 
 resource "google_compute_instance_from_template" "instance" {
