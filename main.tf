@@ -3,9 +3,39 @@ provider "google" {
   region  = "us-central1"
 }
 
-data "google_compute_region_disk" "existing_regiondisk" {
-  name   = "my-region-disk"
-  region = "us-central1"
+resource "google_compute_disk" "disk" {
+  name  = "my-disk"
+  image = "debian-cloud/debian-11"
+  size  = 50
+  type  = "pd-ssd"
+  zone  = "us-central1-a"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_compute_snapshot" "snapdisk" {
+  name        = "my-snapshot"
+  source_disk = google_compute_disk.disk.name
+  zone        = "us-central1-a"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_compute_region_disk" "regiondisk" {
+  name                      = "my-region-disk"
+  snapshot                  = google_compute_snapshot.snapdisk.id
+  type                      = "pd-ssd"
+  region                    = "us-central1"
+  physical_block_size_bytes = 4096
+  replica_zones             = ["us-central1-a", "us-central1-f"]
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_compute_instance" "instance" {
@@ -14,11 +44,15 @@ resource "google_compute_instance" "instance" {
   zone         = "us-central1-a"
 
   boot_disk {
-    source = data.google_compute_region_disk.existing_regiondisk.self_link
+    source = google_compute_region_disk.regiondisk.self_link
   }
 
   network_interface {
     network = "default"
+
+    access_config {
+      // Ephemeral IP
+    }
   }
 
   lifecycle {
