@@ -9,12 +9,20 @@ resource "google_compute_disk" "disk" {
   size  = 50
   type  = "pd-ssd"
   zone  = "us-central1-a"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_compute_snapshot" "snapdisk" {
   name        = "my-snapshot"
   source_disk = google_compute_disk.disk.name
   zone        = "us-central1-a"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_compute_region_disk" "regiondisk" {
@@ -23,6 +31,9 @@ resource "google_compute_region_disk" "regiondisk" {
   type                      = "pd-ssd"
   region                    = "us-central1"
   physical_block_size_bytes = 4096
+  replica_zones             = ["us-central1-a", "us-central1-f"]
 
-  replica_zones = ["us-central1-a", "us-central1-f"]
+  lifecycle {
+    prevent_destroy = true
+  }
 }
