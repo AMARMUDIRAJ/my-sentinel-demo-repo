@@ -3,23 +3,26 @@ provider "google" {
   region  = "us-central1"
 }
 
-data "google_compute_region_disk" "regiondisk" {
-  name   = "my-region-disk"
-  region = "us-central1"
+resource "google_compute_disk" "disk" {
+  name  = "my-disk"
+  image = "debian-cloud/debian-11"
+  size  = 50
+  type  = "pd-ssd"
+  zone  = "us-central1-a"
 }
 
-resource "google_compute_instance" "example" {
-  name         = "example-instance"
-  machine_type = "e2-medium"
-  zone         = "us-central1-a"
+resource "google_compute_snapshot" "snapdisk" {
+  name        = "my-snapshot"
+  source_disk = google_compute_disk.disk.name
+  zone        = "us-central1-a"
+}
 
-  boot_disk {
-    source = data.google_compute_region_disk.regiondisk.self_link
-  }
+resource "google_compute_region_disk" "regiondisk" {
+  name                      = "my-region-disk"
+  snapshot                  = google_compute_snapshot.snapdisk.id
+  type                      = "pd-ssd"
+  region                    = "us-central1"
+  physical_block_size_bytes = 4096
 
-  network_interface {
-    network = "my-own-network-dev"
-    subnetwork = "web-subnet"
-    access_config {}
-  }
+  replica_zones = ["us-central1-a", "us-central1-f"]
 }
